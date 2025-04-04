@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CERFA Frigo - Massinissa Ouerdi</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1em;
+      background: #f0f0f0;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      background: white;
+      padding: 1em;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.3em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 1.5em;
+      width: 100%;
+      padding: 0.8em;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    .checkbox-group {
+      margin-top: 1em;
+    }
+    .checkbox-group label {
+      display: block;
+      margin-bottom: 0.3em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fiche CERFA Frigorifique</h1>
+  <form id="cerfaForm">
+    <label>Nom du client
+      <input type="text" id="client" required>
+    </label>
+    <label>Adresse d'intervention
+      <input type="text" id="adresse" required>
+    </label>
+    <label>Date d'intervention
+      <input type="date" id="date" required>
+    </label>
+    <label>Type de gaz
+      <select id="gaz" required>
+        <option value="R410A">R410A</option>
+        <option value="R32">R32</option>
+        <option value="R134a">R134a</option>
+        <option value="R407C">R407C</option>
+      </select>
+    </label>
+    <div class="checkbox-group">
+      <strong>Nature de l'intervention :</strong><br>
+      <label><input type="checkbox" id="mise_service"> Mise en service</label>
+      <label><input type="checkbox" id="maintenance"> Maintenance</label>
+      <label><input type="checkbox" id="controle"> Contrôle étanchéité</label>
+      <label><input type="checkbox" id="demontage"> Démontage</label>
+    </div>
+    <label>Quantité chargée (kg)
+      <input type="number" step="0.01" id="chargee">
+    </label>
+    <label>Quantité récupérée (kg)
+      <input type="number" step="0.01" id="recuperee">
+    </label>
+    <label>Observation / Description
+      <textarea id="description" rows="4"></textarea>
+    </label>
+    <button type="button" onclick="genererPDF()">Générer le PDF</button>
+  </form>
+
+  <script>
+    async function genererPDF() {
+      const {{ jsPDF }} = window.jspdf;
+      const doc = new jsPDF();
+
+      const client = document.getElementById('client').value;
+      const adresse = document.getElementById('adresse').value;
+      const date = document.getElementById('date').value;
+      const gaz = document.getElementById('gaz').value;
+      const chargee = document.getElementById('chargee').value;
+      const recuperee = document.getElementById('recuperee').value;
+      const description = document.getElementById('description').value;
+
+      const miseService = document.getElementById('mise_service').checked ? "✔ Mise en service" : "";
+      const maintenance = document.getElementById('maintenance').checked ? "✔ Maintenance" : "";
+      const controle = document.getElementById('controle').checked ? "✔ Contrôle étanchéité" : "";
+      const demontage = document.getElementById('demontage').checked ? "✔ Démontage" : "";
+
+      doc.setFontSize(12);
+      doc.text("Fiche d'intervention frigorifique - CERFA 15497*04", 20, 20);
+      doc.text("SIRET : 72980501000034", 20, 28);
+      doc.text("Technicien : Massinissa Ouerdi (Technicien)", 20, 36);
+      doc.text(`Client : ${client}`, 20, 48);
+      doc.text(`Adresse : ${adresse}`, 20, 56);
+      doc.text(`Date : ${date}`, 20, 64);
+      doc.text(`Type de gaz : ${gaz}`, 20, 72);
+      doc.text("Intervention :", 20, 80);
+      doc.text(`${miseService} ${maintenance} ${controle} ${demontage}`, 20, 88);
+      doc.text(`Charge : ${chargee} kg`, 20, 96);
+      doc.text(`Récupération : ${recuperee} kg`, 20, 104);
+      doc.text("Observation :", 20, 112);
+      doc.text(doc.splitTextToSize(description, 170), 20, 120);
+
+      doc.save(`CERFA_${client}_${date}.pdf`);
+    }
+  </script>
+</body>
+</html>
