@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche Frigorifique</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1em;
+      background: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      background: white;
+      padding: 1em;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.3em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 1.5em;
+      width: 100%;
+      padding: 0.8em;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fiche d'Intervention Frigorifique</h1>
+  <form id="ficheForm">
+    <label>Nom du client
+      <input type="text" id="client" required>
+    </label>
+    <label>Adresse de l'intervention
+      <input type="text" id="adresse" required>
+    </label>
+    <label>Date d'intervention
+      <input type="date" id="date" required>
+    </label>
+    <label>Description de l'intervention
+      <textarea id="description" rows="4" required></textarea>
+    </label>
+    <label>Quantité de fluide récupérée (kg)
+      <input type="number" step="0.01" id="recuperee" required>
+    </label>
+    <label>Quantité de fluide chargée (kg)
+      <input type="number" step="0.01" id="chargee" required>
+    </label>
+    <button type="button" onclick="genererPDF()">Générer le PDF</button>
+  </form>
+
+  <script>
+    async function genererPDF() {
+      const {{ jsPDF }} = window.jspdf;
+      const doc = new jsPDF();
+
+      const client = document.getElementById('client').value;
+      const adresse = document.getElementById('adresse').value;
+      const date = document.getElementById('date').value;
+      const description = document.getElementById('description').value;
+      const recuperee = document.getElementById('recuperee').value;
+      const chargee = document.getElementById('chargee').value;
+
+      doc.setFontSize(12);
+      doc.text("Fiche d'intervention frigorifique", 20, 20);
+      doc.text("SIRET : 72980501000034", 20, 30);
+      doc.text("Adresse entreprise : 10 route d'Hargeville, 78790 Arnouville-lès-Mantes", 20, 38);
+      doc.text("Technicien : Maxime Orange", 20, 46);
+      doc.text("Attestation capacité : 18575", 20, 54);
+
+      doc.text(`Client : ${client}`, 20, 70);
+      doc.text(`Adresse intervention : ${adresse}`, 20, 78);
+      doc.text(`Date intervention : ${date}`, 20, 86);
+      doc.text("Description :", 20, 94);
+      doc.text(doc.splitTextToSize(description, 170), 20, 102);
+      doc.text(`Fluide récupéré : ${recuperee} kg`, 20, 140);
+      doc.text(`Fluide chargé : ${chargee} kg`, 20, 148);
+
+      doc.save(`Fiche_${client}_${date}.pdf`);
+    }
+  </script>
+</body>
+</html>
